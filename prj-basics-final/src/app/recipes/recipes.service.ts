@@ -4,10 +4,11 @@ import { Ingredient } from "../shared/ingredient.model";
 import { ShoppingListService } from "../shopping-list/shopping-list.service";
 import { Recipe } from "./recipe.model";
 
-@Injectable()
+@Injectable({providedIn:"root"})
 export class RecipesService {
 
-    private recipesItemEvent = new Subject<Recipe>();
+    recipesEvent = new Subject<Recipe[]>();
+    
     private recipes: Recipe[] = [
         new Recipe('Chole Masala',
          'A Tasty Gravy of Onion with Boiled Chickpeas',
@@ -34,7 +35,26 @@ export class RecipesService {
           return this.recipes.slice();
       }
 
+      getRecipe(index:number) {
+        return this.recipes[index];
+    }
+
       addIngredientsToShoppingList(ingredients: Ingredient[]) {
         ingredients.forEach( e=> this.shoppingListService.addIngredients(e));
+      }
+
+      addRecipe(recipe: Recipe) {
+        this.recipes.push(recipe);
+        this.recipesEvent.next(this.recipes.slice())
+      }
+
+      updateRecipe(index:number, newRecipe: Recipe) {
+        this.recipes[index]=newRecipe;
+        this.recipesEvent.next(this.recipes.slice())
+      }
+
+      deleteRecipe(id: number) {
+        this.recipes.splice(id,1);
+        this.recipesEvent.next(this.recipes.slice());
       }
 }
